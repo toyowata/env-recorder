@@ -1,0 +1,59 @@
+{
+    "macros": [
+        "MBED_CONF_APP_MAIN_STACK_SIZE=4096",
+        "MBED_TRACE_MAX_LEVEL=TRACE_LEVEL_INFO"
+    ],
+    "target_overrides": {
+        "*": {
+            "mbed-trace.enable"                 : 0,
+            "platform.stdio-baud-rate"          : 115200,
+            "platform.stdio-convert-newlines"   : true,
+            "platform.default-serial-baud-rate" : 115200,
+            "platform.stdio-buffered-serial"    : true,
+            "nsapi.default-wifi-security"       : "WPA_WPA2",
+            "nsapi.default-wifi-ssid"           : "\"SSID\"",
+            "nsapi.default-wifi-password"       : "\"PASSWORD\"",
+            "nsapi.default-cellular-plmn"       : 0,
+            "nsapi.default-cellular-apn"        : "\"soracom.io\"",
+            "nsapi.default-cellular-username"   : "\"sora\"",
+            "nsapi.default-cellular-password"   : "\"sora\""
+        },
+        "WIO_3G": {
+            "target.device_has_remove"          : ["SERIAL_FC"],
+            "target.features_add"               : ["LWIP"],
+            "target.components_add"             : ["SD"],
+            "lwip.ipv4-enabled"                 : true,
+            "lwip.ethernet-enabled"             : false,
+            "lwip.ppp-enabled"                  : true,
+            "lwip.tcp-enabled"                  : true,
+            "cellular.use-apn-lookup"           : false,
+            "cellular.debug-at"                 : false,
+            "sd.SPI_MOSI"                       : "PC_12",
+            "sd.SPI_MISO"                       : "PC_11",
+            "sd.SPI_CLK"                        : "PC_10",
+            "sd.SPI_CS"                         : "PD_0"
+        },
+        "WIO_BG96": {
+            "target.features_add"               : ["LWIP"],
+            "target.components_add"             : ["SD"],
+            "lwip.ipv4-enabled"                 : true,
+            "lwip.ethernet-enabled"             : false,
+            "lwip.ppp-enabled"                  : true,
+            "lwip.tcp-enabled"                  : true,
+            "cellular.use-apn-lookup"           : false,
+            "cellular.debug-at"                 : false,
+            "nsapi.default-cellular-plmn"       : "\"44052\"",
+            "sd.SPI_MOSI"                       : "PC_12",
+            "sd.SPI_MISO"                       : "PC_11",
+            "sd.SPI_CLK"                        : "PC_10",
+            "sd.SPI_CS"                         : "PD_0"
+        },
+        "RZ_A1H": {
+            "target.macros_add": ["MBEDTLS_TEST_NULL_ENTROPY", "MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES"]
+        },
+        "GR_LYCHEE": {
+            "target.components_add"                     : ["WIFI_ESP32"],
+            "target.network-default-interface-type"     : "WIFI"
+        }
+    }
+}
