@@ -22,4 +22,4 @@ LED Button は、Grove D20 コネクタに接続します。
 
 SDカードの書き込まれたファイルは、CSV形式で保存されているので、エクセルなどでグラフとして表示することが出来ます。
 
-<img src="./graph.jpg" width="320px">
+<img src="./graph.jpg" width="640px">
