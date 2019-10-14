@@ -104,7 +104,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    fp = fopen("/fs/record.txt", "a");
+    fp = fopen("/fs/record.csv", "a");
     printf("%s\n", (!fp ? "Fail :(" : "OK"));
     if (!fp) {
         error("error: %s (%d)\n", strerror(errno), -errno);
