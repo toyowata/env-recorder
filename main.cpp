@@ -12,6 +12,7 @@ BlockDevice *bd = BlockDevice::get_default_instance();
 FATFileSystem fs("fs");
 
 #if defined(TARGET_WIO_3G) || defined(TARGET_WIO_BG96)
+#include "cellular/onboard_modem_api.h"
 DigitalOut GrovePower(GRO_POWR, 1);
 #undef LED1
 #define LED1 D20
@@ -86,7 +87,12 @@ int main(int argc, char* argv[])
     now += (3600 * 9); // Adjust to JST timezone
     set_time(now);
     printf("Time is now %s", ctime(&now));
-    
+
+#if defined(TARGET_WIO_3G) || defined(TARGET_WIO_BG96)
+    network->disconnect();
+    onboard_modem_power_down();
+#endif
+
     // Try to mount the filesystem
     printf("Mounting the filesystem... ");
     fflush(stdout);

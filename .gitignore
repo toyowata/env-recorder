@@ -32,3 +32,6 @@
 
 # Misc
 .DS_Store
+
+/BME280
+/ntp-client
