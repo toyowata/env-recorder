@@ -35,3 +35,8 @@
 
 /BME280
 /ntp-client
+/SSD1308_128x64_I2C
+/COMPONENT_WIFI_ESP32
+
+.mbedls-mock
+.mbedls-mock.lock

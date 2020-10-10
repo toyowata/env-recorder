@@ -5,14 +5,16 @@
 #include "BME280.h"
 #include "BlockDevice.h"
 #include "FATFileSystem.h"
+#include "SSD1308.h"
 
-#define MEASURE_PERIOD (30 * 1000) // 30 sec
+#define MEASURE_PERIOD 30s
+#define FORCE_STORAGE_FORMAT    0
 
 BlockDevice *bd = BlockDevice::get_default_instance();
 FATFileSystem fs("fs");
 
 #if defined(TARGET_WIO_3G) || defined(TARGET_WIO_BG96)
-#include "cellular/onboard_modem_api.h"
+//#include "cellular/onboard_modem_api.h"
 DigitalOut GrovePower(GRO_POWR, 1);
 #undef LED1
 #define LED1 D20
@@ -20,7 +22,10 @@ DigitalOut GrovePower(GRO_POWR, 1);
 #define BUTTON1 D19
 #endif
 
-BME280 sensor(I2C_SDA, I2C_SCL);
+I2C i2c(I2C_SDA, I2C_SCL);
+BME280 sensor(i2c);
+SSD1308 oled(&i2c, SSD1308_SA0);
+
 DigitalOut led(LED1);
 InterruptIn button(BUTTON1);
 FILE *fp = (FILE *)NULL;
@@ -32,13 +37,15 @@ void record_handler(void);
 
 void button_handler() 
 {
-    fclose(fp);
-    fp = NULL;
+    if (fp != NULL) {
+        fclose(fp);
+        fp = NULL;
+    }
     printf("Safe to power off.\n");
     
     while(1) {
         led = !led;
-        wait(0.2f);
+        ThisThread::sleep_for(200ms);
     }
 }
 
@@ -54,7 +61,21 @@ void record_handler()
     p = sensor.getPressure(), 
 
     printf("%s, %5.2f DegC, %5.2f %%, %5.2f hPa\n", buf, t, h, p);
-    fprintf(fp, "%s, %5.2f, %5.2f, %5.2f\n", buf, t, h, p);
+
+    if (fp != NULL) {
+        fprintf(fp, "%s, %5.2f, %5.2f, %5.2f\n", buf, t, h, p);
+    }
+
+    strftime(buf, sizeof(buf), "%m/%d %H:%M:%S", localtime(&now));
+    oled.writeString(2, 0, buf);
+    sprintf(buf, "%7.2f DegC", t);
+    oled.writeString(4, 0, buf);
+    sprintf(buf, "%7.2f %%", h);
+    oled.writeString(5, 0, buf);
+    sprintf(buf, "%7.2f hPa", p);
+    oled.writeString(6, 0, buf);
+    
+
     led = !led;
 }
 
@@ -62,7 +83,9 @@ int main(int argc, char* argv[])
 {
     NetworkInterface* network = NULL;
 
-    wait(1);
+    ThisThread::sleep_for(1s);
+    oled.writeString(0, 0, "[Env-Recorder]");
+
     printf("\n== Envoironment data recorder example ==\n\n");
     printf("Opening network interface...\r\n");
 
@@ -72,8 +95,9 @@ int main(int argc, char* argv[])
         return -1;
     }
     network->connect();
-    const char *ip = network->get_ip_address();
-    printf("IP address: %s\n", ip ? ip : "None");
+    SocketAddress ip_address;
+    network->get_ip_address(&ip_address);
+    printf("IP address: '%s'\n", ip_address.get_ip_address());
 
     printf("Network interface opened successfully.\r\n");
     printf("\r\n");
@@ -88,17 +112,17 @@ int main(int argc, char* argv[])
     set_time(now);
     printf("Time is now %s", ctime(&now));
 
-#if defined(TARGET_WIO_3G) || defined(TARGET_WIO_BG96)
     network->disconnect();
-    onboard_modem_power_down();
-#endif
 
     // Try to mount the filesystem
     printf("Mounting the filesystem... ");
     fflush(stdout);
-    int err = fs.mount(bd);
+    int err = -1;
+    if(bd != NULL) {
+        err = fs.mount(bd);
+    }
     printf("%s\n", (err ? "Fail :(" : "OK"));
-    if (err) {
+    if (err && FORCE_STORAGE_FORMAT) {
         // Reformat if we can't mount the filesystem
         // this should only happen on the first boot
         printf("No filesystem found, formatting... ");
@@ -113,7 +137,7 @@ int main(int argc, char* argv[])
     fp = fopen("/fs/record.csv", "a");
     printf("%s\n", (!fp ? "Fail :(" : "OK"));
     if (!fp) {
-        error("error: %s (%d)\n", strerror(errno), -errno);
+        printf("Cannot open data file\n");
     }
 
     sensor.initialize();
