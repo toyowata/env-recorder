@@ -37,6 +37,7 @@
 /ntp-client
 /SSD1308_128x64_I2C
 /COMPONENT_WIFI_ESP32
+/esp32-driver
 
 .mbedls-mock
 .mbedls-mock.lock

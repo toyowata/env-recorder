@@ -42,7 +42,9 @@ void button_handler()
         fp = NULL;
     }
     printf("Safe to power off.\n");
-    
+    oled.clearDisplay();
+    oled.writeString(0, 0, "Bye!");
+
     while(1) {
         led = !led;
         ThisThread::sleep_for(200ms);
@@ -74,7 +76,6 @@ void record_handler()
     oled.writeString(5, 0, buf);
     sprintf(buf, "%7.2f hPa", p);
     oled.writeString(6, 0, buf);
-    
 
     led = !led;
 }

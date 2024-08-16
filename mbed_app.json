@@ -13,7 +13,7 @@
             "platform.callback-nontrivial"      : true,
             "target.printf_lib"                 : "std",
             "nsapi.default-wifi-security"       : "WPA_WPA2",
-            "nsapi.default-wifi-ssid"           : "\"SSID\"",
+            "nsapi.default-wifi-ssid"           : "\"SSOD\"",
             "nsapi.default-wifi-password"       : "\"PASSWORD\"",
             "nsapi.default-cellular-plmn"       : 0,
             "nsapi.default-cellular-apn"        : "\"soracom.io\"",
@@ -58,7 +58,7 @@
             "target.network-default-interface-type"     : "WIFI"
         },
         "K64F": {
-            "target.network-default-interface-type"     : "ETHERNET",
+            "target.network-default-interface-type"     : "WIFI",
             "esp8266.rx"                                : "D0",
             "esp8266.tx"                                : "D1",
             "esp8266.provide-default"                   : true
